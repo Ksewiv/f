@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>EduPace — расписание и мероприятия для школьников и студентов Москвы</title>
+<script>(function(){var t=null;try{t=localStorage.getItem("edupace_theme")}catch(e){}if(!t){t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light"}document.documentElement.setAttribute("data-theme",t)})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;700&family=Unbounded:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--white:#fff;--bg:#f8f5ff;--lilac:#ede7fb;--line:#e0d6f5;--ink:#241a3d;--muted:#6b5f8a;--violet:#6d3fd6;--violet-dark:#4f2aa8;--c1:#6d3fd6;--c2:#a35fe0;--c3:#3f3fb8;--c4:#c24bb0;--r:14px;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-behavior:smooth;scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Golos Text",system-ui,Arial,sans-serif;line-height:1.55}
+h1,h2,h3{font-family:"Unbounded","Golos Text",system-ui,sans-serif;line-height:1.2;margin:0}
+:focus-visible{outline:3px solid var(--violet);outline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+header{background:var(--white);border-bottom:1px solid var(--line);position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+header .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:12px;padding-bottom:12px;flex-wrap:wrap}
+.logo{font-family:"Unbounded",sans-serif;font-weight:700;font-size:1.2rem;text-decoration:none;color:var(--violet);display:flex;align-items:center;gap:10px}
+.logo i{width:30px;height:30px;border-radius:9px;background:var(--violet);display:inline-grid;place-items:center;color:#fff;font-style:normal;font-size:.9rem}
+.logo span{color:var(--ink)}
+nav{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+nav a{text-decoration:none;color:var(--ink);padding:8px 14px;border-radius:999px;font-weight:500;font-size:.95rem}
+nav a:hover{background:var(--lilac);color:var(--violet-dark)}
+nav a.me{display:flex;align-items:center;gap:8px;border:2px solid var(--line)}
+.ava{width:26px;height:26px;border-radius:50%;background:var(--violet);color:#fff;display:inline-grid;place-items:center;font-size:.8rem;font-weight:700}
+.hero{padding:56px 0 40px}
+.hero h1{font-size:clamp(1.9rem,5vw,3.2rem);max-width:17ch}
+.hero p{max-width:56ch;color:var(--muted);font-size:1.1rem;margin:18px 0 26px}
+.pace{display:flex;align-items:flex-end;gap:6px;height:44px;margin-bottom:26px}
+.pace i{display:block;width:14px;border-radius:5px 5px 0 0;background:var(--violet)}
+.pace i:nth-child(odd){background:var(--c2)}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.btn{display:inline-block;border:0;cursor:pointer;font:inherit;font-weight:700;padding:12px 22px;border-radius:999px;background:var(--violet);color:#fff;text-decoration:none}
+.btn:hover{background:var(--violet-dark)}
+.btn.alt{background:var(--white);color:var(--violet-dark);border:2px solid var(--line)}
+.btn.alt:hover{background:var(--lilac)}
+.btn.outline{background:transparent;color:var(--violet-dark);border:2px solid var(--violet)}
+.btn.outline:hover{background:var(--lilac)}
+section{padding:40px 0}
+section>.wrap>h2{font-size:clamp(1.4rem,3vw,2rem);margin-bottom:8px}
+.lead{color:var(--muted);margin:0 0 24px;max-width:62ch}
+.panel{background:var(--white);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+form.add{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;align-items:end;margin-bottom:22px}
+label{display:flex;flex-direction:column;gap:4px;font-size:.85rem;font-weight:500;color:var(--muted)}
+input,select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px;width:100%}
+input:focus,select:focus{border-color:var(--violet)}
+.err{color:#b3261e;font-size:.9rem;min-height:1.3em;margin:-8px 0 12px}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+.stat{display:flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;background:var(--lilac);font-size:.9rem}
+.dot{width:12px;height:12px;border-radius:50%;display:inline-block}
+.week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px}
+.day{background:var(--bg);border-radius:12px;padding:10px;min-height:120px}
+.day h3{font-size:.8rem;font-family:"Golos Text",sans-serif;font-weight:700;margin-bottom:8px;color:var(--violet-dark)}
+.item{background:var(--white);border:1px solid var(--line);border-left:6px solid var(--c);border-radius:8px;padding:8px 8px 8px 10px;margin-bottom:8px;font-size:.85rem;position:relative}
+.item time{display:block;color:var(--muted);font-size:.78rem}
+.item button{position:absolute;top:4px;right:4px;border:0;background:none;color:var(--muted);cursor:pointer;font-size:1rem;line-height:1;padding:4px}
+.item button:hover{color:#b3261e}
+.item strong{display:block;padding-right:16px;overflow-wrap:anywhere}
+.empty{color:var(--muted);font-size:.8rem}
+.calhead{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.calhead h3{font-size:1.1rem;flex:1;min-width:150px;text-align:center;font-family:"Unbounded",sans-serif}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.wd{text-align:center;font-size:.8rem;font-weight:700;color:var(--muted);padding:4px 0}
+.cell{min-height:86px;background:var(--bg);border:2px solid transparent;border-radius:10px;padding:6px;display:flex;flex-direction:column;gap:3px;text-align:left;cursor:pointer;font:inherit;color:var(--ink);overflow:hidden;align-items:stretch}
+.cell:hover{border-color:var(--line)}
+.cell.other{opacity:.45}
+.cell.sel{border-color:var(--violet)}
+
+.num{align-self:flex-start;min-width:24px;height:24px;border-radius:12px;display:grid;place-items:center;font-size:.85rem;font-weight:700;padding:0 4px}
+.pill{display:block;border-left:4px solid var(--c);background:var(--white);border-radius:5px;padding:1px 5px;font-size:.72rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.more{font-size:.72rem;color:var(--muted)}
+.dayview{margin-top:16px;border-top:1px solid var(--line);padding-top:14px}
+.dayview h3{font-size:1rem;margin-bottom:10px;font-family:"Golos Text",sans-serif}
+.item button.serie{position:static;display:block;margin-top:4px;font-size:.78rem;text-decoration:underline;color:var(--violet-dark);padding:0}
+#untilRow[hidden]{display:none}
+input[type="color"]{-webkit-appearance:none;appearance:none;width:40px;height:40px;flex:none;padding:0;border:0;border-radius:50%;background:none;cursor:pointer;overflow:hidden}
+input[type="color"]::-webkit-color-swatch-wrapper{padding:0}
+input[type="color"]::-webkit-color-swatch{border:0;border-radius:50%}
+input[type="color"]::-moz-color-swatch{border:0;border-radius:50%}
+.typerow{display:flex;gap:8px;align-items:center}
+.typerow select{flex:1;min-width:0}
+.acts{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px}
+.acts select{margin-top:0}
+.item button.del{position:static;border:2px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.8rem;color:var(--ink);background:var(--white);cursor:pointer}
+.item button.del:hover{color:#b3261e;border-color:#b3261e}
+.item button.del.neutral:hover{color:var(--violet-dark);border-color:var(--violet)}
+select{-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%236b5f8a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center;background-size:12px 8px;padding-right:38px}
+[data-theme="dark"] select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23b3a8d1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
+.item select{background-position:right 10px center;padding-right:28px}
+#profile,#editor{display:none;position:fixed;inset:0;z-index:30;background:rgba(20,12,40,.55);padding:calc(20px + env(safe-area-inset-top,0px)) 20px calc(20px + env(safe-area-inset-bottom,0px));overflow:auto}
+#profile.open,#editor.open{display:block}
+#profile .wrap,#editor .wrap{position:relative;background:var(--bg);border:1px solid var(--line);border-radius:16px;padding:24px;max-width:900px;margin:0 auto}
+#profile .wrap>h2,#editor .wrap>h2{margin-right:50px}
+#editor .wrap{max-width:560px}
+#editor form.add{margin-bottom:0}
+.chk{flex-direction:row;align-items:center;gap:8px;grid-column:1/-1}
+.chk input{width:auto}
+#eAllRow[hidden]{display:none}
+#editor .err,#editor .btn{grid-column:1/-1}
+nav a[aria-current="true"]{text-decoration:underline;text-decoration-color:var(--violet);text-decoration-thickness:3px;text-underline-offset:8px;color:var(--violet-dark)}
+.pclose{position:absolute;top:16px;right:16px;font-size:1.4rem;line-height:1}
+:root{--pg1:#6d3fd6;--pg2:#d0399f}
+:root[data-theme="dark"]{--pg1:#a98bff;--pg2:#f07ad8}
+.prem{background-image:linear-gradient(90deg,var(--pg1),var(--pg2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;font-weight:700}
+.btn.outline.premium-btn{border:2px solid transparent;background:linear-gradient(var(--white),var(--white)) padding-box,linear-gradient(90deg,var(--pg1),var(--pg2)) border-box}
+.btn.outline.premium-btn:hover{background:linear-gradient(var(--lilac),var(--lilac)) padding-box,linear-gradient(90deg,var(--pg1),var(--pg2)) border-box}
+.remindbar{font-size:.85rem;color:var(--muted);margin:0 0 6px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.remind-stack{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));right:12px;z-index:20;display:flex;flex-direction:column;gap:8px;max-width:min(340px,calc(100vw - 24px))}
+.remind{background:var(--white);color:var(--ink);border:2px solid var(--violet);border-radius:12px;padding:10px 12px;box-shadow:0 6px 20px rgba(0,0,0,.18);display:flex;gap:10px;justify-content:space-between;align-items:flex-start;font-size:.9rem}
+.remind b{display:block}
+.remind button{border:0;background:none;color:var(--muted);cursor:pointer;font-size:1.1rem;line-height:1}
+.item select{font-size:.78rem;padding:3px 6px;margin-top:6px;width:auto}
+@media (max-width:560px){.cell{min-height:58px;flex-direction:row;flex-wrap:wrap;align-items:flex-start;padding:4px}.pill{font-size:0;height:8px;width:8px;border-radius:50%;padding:0;border:0;background:var(--c)}.more{font-size:.65rem}}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.chip{border:2px solid var(--line);background:var(--white);color:var(--ink);font:inherit;font-size:.9rem;padding:6px 14px;border-radius:999px;cursor:pointer}
+.chip:hover{background:var(--lilac)}
+.chip[aria-pressed="true"]{background:var(--violet);color:#fff;border-color:var(--violet)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-top:16px}
+.card{background:var(--white);border:1px solid var(--line);border-top:6px solid var(--c);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:6px}
+.card h3{font-size:1rem;font-family:"Golos Text",sans-serif;font-weight:700}
+.card .meta{color:var(--muted);font-size:.9rem}
+.tag{align-self:flex-start;font-size:.78rem;font-weight:700;padding:2px 10px;border-radius:999px;background:var(--c);color:#fff}
+.card .btn{margin-top:auto;padding:9px 16px;font-size:.9rem;align-self:flex-start}
+.card .btn:disabled{background:var(--lilac);color:var(--muted);cursor:default}
+.note{font-size:.85rem;color:var(--muted);margin-top:16px}
+.tips{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+.tip{background:var(--white);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.tip h3{font-size:1rem;font-family:"Golos Text",sans-serif;margin-bottom:6px;color:var(--violet-dark)}
+.tip p{margin:0;color:var(--muted);font-size:.95rem}
+.profile{display:grid;grid-template-columns:260px 1fr;gap:20px}
+.pcard{background:var(--lilac);border-radius:var(--r);padding:22px;text-align:center}
+.pcard .big{width:84px;height:84px;border-radius:50%;background:var(--violet);color:#fff;display:grid;place-items:center;font-family:"Unbounded",sans-serif;font-size:2rem;margin:0 auto 12px}
+.pcard h3{font-size:1.05rem;font-family:"Golos Text",sans-serif;overflow-wrap:anywhere}
+.pcard p{margin:4px 0;color:var(--muted);font-size:.9rem}
+.plans{margin-top:14px;display:flex;flex-direction:column;gap:6px;align-items:center}
+.plan-badge{background:var(--violet);color:#fff;font-size:.78rem;font-weight:700;padding:3px 10px;border-radius:999px}
+.pform{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;align-content:start}
+.pform .full{grid-column:1/-1}
+.pform .btn{justify-self:start}
+.plans-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
+.plan{background:var(--white);border:2px solid var(--line);border-radius:var(--r);padding:22px;display:flex;flex-direction:column;gap:10px}
+.plan.on{border-color:var(--violet);background:var(--lilac)}
+.plan h3{font-size:1.05rem;font-family:"Golos Text",sans-serif}
+.plan .price{font-family:"Unbounded",sans-serif;font-size:1.8rem;color:var(--violet-dark)}
+.plan .price small{font-size:.9rem;font-family:"Golos Text",sans-serif;color:var(--muted)}
+.plan p{margin:0;color:var(--muted);font-size:.95rem}
+.plan .btn{margin-top:auto;text-align:center}
+.total{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:18px;padding:16px 20px;background:var(--white);border:1px solid var(--line);border-radius:var(--r)}
+.total strong{color:var(--violet-dark)}
+footer{background:var(--white);border-top:1px solid var(--line);padding:24px 0;color:var(--muted);font-size:.9rem;margin-top:20px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--violet-dark);color:#fff;padding:10px 18px;border-radius:999px;font-size:.9rem;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.on{opacity:1}
+.theme-btn{white-space:nowrap}
+.icon-btn{width:40px;height:40px;border-radius:50%;border:2px solid var(--line);background:var(--white);color:var(--ink);display:inline-grid;place-items:center;cursor:pointer;padding:0}
+.icon-btn:hover{background:var(--lilac)}
+.icon-btn svg{width:20px;height:20px}
+#auth{position:relative}
+#auth>.icon-btn{position:absolute;top:16px;right:16px}
+:root[data-theme="dark"]{color-scheme:dark;--white:#1b1530;--bg:#120d22;--lilac:#2a2145;--line:#3a2f5c;--ink:#f1ecff;--muted:#b3a8d1;--violet:#7f57ea;--violet-dark:#b9a0ff;--c1:#8a63f2;--c2:#b57be8;--c3:#6f6fe6;--c4:#d868c4}
+[data-theme="dark"] .btn:hover{background:#6c43d8}
+[data-theme="dark"] .btn.alt:hover,[data-theme="dark"] .btn.outline:hover{background:var(--lilac)}
+[data-theme="dark"] .toast{background:#5b3bb5}
+[data-theme="dark"] .err,[data-theme="dark"] .item button:hover{color:#ff9a92}
+[data-theme="dark"] .logo{color:#b9a0ff}
+.logo .mark{color:var(--ink);--m:url(#gl);flex:none}
+:root[data-theme="dark"] .logo .mark{--m:url(#gd)}
+.logo .wm{color:inherit}
+.logo .wm b{font-weight:inherit;color:var(--ink)}
+.auth-box [hidden]{display:none !important}
+.linkbtn{align-self:flex-start;border:0;background:none;color:var(--violet-dark);font:inherit;font-size:.9rem;text-decoration:underline;cursor:pointer;padding:0}
+.okmsg{color:#1a7f4b;font-size:.9rem}
+[data-theme="dark"] .okmsg{color:#7fe0a8}
+.reset-hint{font-size:.9rem}
+#auth{display:none;min-height:90vh;place-items:center;padding:24px 16px}
+body.guest #auth{display:grid}
+body.guest header,body.guest main,body.guest footer{display:none}
+.auth-box{width:100%;max-width:420px;background:var(--white);border:1px solid var(--line);border-radius:var(--r);padding:28px;display:flex;flex-direction:column;gap:14px}
+.auth-box h1{font-size:1.5rem}
+.auth-box p{margin:0;color:var(--muted)}
+.auth-box form{display:flex;flex-direction:column;gap:12px}
+.auth-box .chips{margin:0}
+.auth-box .err{margin:0}
+#nameRow[hidden]{display:none}
+.out{border:2px solid var(--line);background:var(--white);color:var(--ink);font:inherit;font-size:.9rem;padding:6px 14px;border-radius:999px;cursor:pointer}
+.out:hover{background:var(--lilac)}
+@media (max-width:980px){.week{grid-template-columns:repeat(2,minmax(0,1fr))}.profile{grid-template-columns:1fr}}
+@media (max-width:560px){.week{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.toast{transition:none}}
+</style>
+</head>
+<body class="guest">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<linearGradient id="gl" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#241a3d"/><stop offset="0.125" stop-color="#2a1d4a"/><stop offset="0.25" stop-color="#3b266d"/><stop offset="0.375" stop-color="#52319e"/><stop offset="0.5" stop-color="#6d3fd6"/><stop offset="0.625" stop-color="#913dc2"/><stop offset="0.75" stop-color="#b13bb0"/><stop offset="0.875" stop-color="#c83aa4"/><stop offset="1" stop-color="#d0399f"/></linearGradient>
+<linearGradient id="gd" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f1ecff"/><stop offset="0.125" stop-color="#eae2ff"/><stop offset="0.25" stop-color="#d7c9ff"/><stop offset="0.375" stop-color="#bda5ff"/><stop offset="0.5" stop-color="#9f7bff"/><stop offset="0.625" stop-color="#bd7bf1"/><stop offset="0.75" stop-color="#d77be4"/><stop offset="0.875" stop-color="#e97adb"/><stop offset="1" stop-color="#f07ad8"/></linearGradient>
+</defs></svg>
+<section id="auth" aria-label="Вход и регистрация">
+  <button type="button" class="theme-btn icon-btn"></button>
+  <div class="auth-box">
+    <a class="logo" href="#top"><svg class="mark" viewBox="0 0 64 64" width="34" height="34" aria-hidden="true"><rect x="10" y="8" width="10" height="48" rx="5" fill="currentColor"/><rect x="10" y="8" width="34" height="10" rx="5" fill="currentColor"/><rect x="10" y="27" width="36" height="10" rx="5" style="fill:var(--m)"/><rect x="10" y="46" width="46" height="10" rx="5" fill="currentColor"/></svg><span class="wm">Edu<b>Pace</b></span></a>
+    <h1>Добро пожаловать</h1>
+    <p>Войдите или создайте аккаунт, чтобы сохранить своё расписание и профиль.</p>
+    <div class="chips" role="group" aria-label="Вход или регистрация">
+      <button type="button" class="chip" id="tabLogin" aria-pressed="true">Вход</button>
+      <button type="button" class="chip" id="tabReg" aria-pressed="false">Регистрация</button>
+    </div>
+    <form id="authForm">
+      <label id="nameRow" hidden>Имя<input id="aName" type="text" maxlength="40" placeholder="Например, Анна" autocomplete="name"></label>
+      <label>Электронная почта<input id="aEmail" type="email" required placeholder="name@example.com" autocomplete="email"></label>
+      <label id="passRow">Пароль<input id="aPass" type="password" required minlength="6" placeholder="Не короче 6 символов" autocomplete="current-password"></label>
+      <button type="button" class="linkbtn" id="forgotBtn">Забыли пароль?</button>
+      <p class="reset-hint" id="resetHint" hidden>Введите почту, с которой вы регистрировались. Мы отправим на неё письмо со ссылкой, перейдите по ней и придумайте новый пароль. Если письма нет несколько минут, проверьте папку «Спам».</p>
+      <div class="err" id="aErr" role="alert"></div>
+      <div class="okmsg" id="aOk" role="status"></div>
+      <button class="btn" id="aBtn" type="submit">Войти</button>
+      <button type="button" class="linkbtn" id="backBtn" hidden>Назад ко входу</button>
+    </form>
+    <p class="note">Демо-версия: аккаунт хранится только в этом браузере, на сервер ничего не отправляется.</p>
+  </div>
+</section>
+<header>
+  <div class="wrap">
+    <a class="logo" href="#top"><svg class="mark" viewBox="0 0 64 64" width="34" height="34" aria-hidden="true"><rect x="10" y="8" width="10" height="48" rx="5" fill="currentColor"/><rect x="10" y="8" width="34" height="10" rx="5" fill="currentColor"/><rect x="10" y="27" width="36" height="10" rx="5" style="fill:var(--m)"/><rect x="10" y="46" width="46" height="10" rx="5" fill="currentColor"/></svg><span class="wm">Edu<b>Pace</b></span></a>
+    <nav aria-label="Разделы">
+      <a href="#schedule">Расписание</a>
+      <a href="#events">Мероприятия</a>
+      <a href="#tips">Советы</a>
+      <a href="#tariffs"><span class="prem">EduPace Premium</span></a>
+      <a class="me" href="#profile"><span class="ava" id="navAva">?</span><span id="navName">Профиль</span></a>
+      <button type="button" class="out" id="logoutBtn">Выйти</button>
+      <button type="button" class="theme-btn icon-btn"></button>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <div class="wrap hero">
+    <div class="pace" aria-hidden="true">
+      <i style="height:18px"></i><i style="height:28px"></i><i style="height:22px"></i><i style="height:36px"></i><i style="height:30px"></i><i style="height:44px"></i>
+    </div>
+    <h1>Успевай учиться и жить</h1>
+    <p>EduPace помогает школьникам и студентам Москвы составить удобное расписание и находить лекции, дни открытых дверей и мастер-классы в свободное время. Всё сохраняется в вашем браузере.</p>
+    <div class="actions">
+      <a class="btn" href="#schedule">Начать</a>
+      <a class="btn outline premium-btn" href="#tariffs"><span class="prem">EduPace Premium</span></a>
+      <a class="btn alt" href="#events">Найти мероприятие</a>
+    </div>
+  </div>
+
+  <section id="schedule">
+    <div class="wrap">
+      <h2>Мой календарь</h2>
+      <p class="lead">Планируйте на недели и месяцы вперёд. Нажмите на день, чтобы увидеть дела внизу: там их можно удалить и настроить напоминание. Новое дело добавляется в форме выше. Уроки и пары можно повторять каждую неделю.</p>
+      <div class="panel">
+        <form class="add" id="addForm">
+          <label>Название<input id="fTitle" type="text" maxlength="60" placeholder="Например, Математика" required></label>
+          <label>Дата<input id="fDate" type="date" required></label>
+          <label>Начало<input id="fStart" type="time" value="09:00" required></label>
+          <label>Конец<input id="fEnd" type="time" value="10:30" required></label>
+          <label>Тип и цвет
+            <span class="typerow"><select id="fType">
+              <option value="study">Учёба</option>
+              <option value="event">Мероприятие</option>
+              <option value="club">Секция и кружок</option>
+              <option value="rest">Отдых и личное</option>
+              <option value="other">Другое</option>
+            </select><input id="fColor" type="color" value="#6d3fd6" aria-label="Цвет метки" title="Цвет метки"></span>
+          </label>
+          <label>Напомнить
+            <select id="fRemind"><option value="0">Не напоминать</option><option value="10">За 10 минут</option><option value="30">За 30 минут</option><option value="60">За час</option><option value="1440">За день</option><option value="2880">За 2 дня</option></select>
+          </label>
+          <label>Повторять
+            <select id="fRep"><option value="none">Не повторять</option><option value="weekly">Каждую неделю</option></select>
+          </label>
+          <label id="untilRow" hidden>Повторять до<input id="fUntil" type="date"></label>
+          <button class="btn" type="submit">Добавить</button>
+        </form>
+        <div class="err" id="err" role="alert"></div>
+        <div class="remindbar"><button type="button" class="linkbtn" id="notifBtn">Включить уведомления браузера</button><span id="notifState"></span></div>
+        <p class="note" style="margin:0 0 14px">Напоминания приходят, пока сайт открыт в браузере. Сообщения на почту или в мессенджер подключаются отдельно, через сервер.</p>
+        <div class="calhead">
+          <button type="button" class="chip" id="prevM" aria-label="Предыдущий месяц">‹</button>
+          <h3 id="calTitle"></h3>
+          <button type="button" class="chip" id="nextM" aria-label="Следующий месяц">›</button>
+          <button type="button" class="chip" id="todayBtn">Сегодня</button>
+        </div>
+        <div class="stats" id="stats" aria-live="polite"></div>
+        <div class="cal" id="calGrid"></div>
+        <div class="dayview" id="dayView" aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="events">
+    <div class="wrap">
+      <h2>Афиша для школьников и студентов</h2>
+      <p class="lead">Выберите, что интересно. Кнопка «В расписание» добавит мероприятие в нужный день.</p>
+      <div class="chips" id="typeChips" role="group" aria-label="Тип мероприятия"></div>
+      <div class="chips" id="audChips" role="group" aria-label="Для кого"></div>
+      <div class="cards" id="cards"></div>
+      <p class="note">Мероприятия в списке — примеры. Замените данные в массиве <code>EVENTS</code> в конце файла на актуальные.</p>
+    </div>
+  </section>
+
+  <section id="tips">
+    <div class="wrap">
+      <h2>Как распределить время</h2>
+      <p class="lead">Три простых правила, с которых удобно начать.</p>
+      <div class="tips">
+        <div class="tip"><h3>Оставляйте окна</h3><p>Не заполняйте день до отказа. Свободный час между занятиями помогает не опаздывать и отдохнуть.</p></div>
+        <div class="tip"><h3>Группируйте дела</h3><p>Домашку по одному предмету делайте за один подход, а поездки по городу объединяйте в один маршрут.</p></div>
+        <div class="tip"><h3>Планируйте пользу</h3><p>Выберите одно мероприятие в неделю и поставьте его в расписание заранее.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="profile" role="dialog" aria-modal="true" aria-label="Личный профиль">
+    <div class="wrap">
+      <button type="button" class="icon-btn pclose" id="profileClose" aria-label="Закрыть профиль">×</button>
+      <h2>Личный профиль</h2>
+      <p class="lead">Расскажите о себе, чтобы мы подбирали подходящие мероприятия. Данные хранятся только на этом устройстве.</p>
+      <div class="profile">
+        <aside class="pcard" aria-live="polite">
+          <div class="big" id="pAva">?</div>
+          <h3 id="pName">Имя не указано</h3>
+          <p id="pRole">Статус не выбран</p>
+          <p id="pPlace">Учебное заведение не указано</p>
+          <p id="pStats">Занятий в расписании: 0</p>
+          <div class="plans" id="pPlans"></div>
+        </aside>
+        <form class="panel pform" id="profileForm">
+          <label>Имя<input id="uName" type="text" maxlength="40" placeholder="Например, Анна"></label>
+          <label>Статус
+            <select id="uRole"><option value="">Выберите</option><option value="Школьник">Школьник</option><option value="Студент">Студент</option></select>
+          </label>
+          <label>Школа или вуз<input id="uPlace" type="text" maxlength="60" placeholder="Название"></label>
+          <label>Возраст<select id="uAge"></select></label>
+          <label>Электронная почта<input id="uEmail" type="email" maxlength="60" placeholder="name@example.com"></label>
+          <label class="full">Интересы<input id="uInterests" type="text" maxlength="100" placeholder="Например, программирование, история, биология"></label>
+          <button class="btn" type="submit">Сохранить профиль</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section id="tariffs">
+    <div class="wrap">
+      <h2><span class="prem">EduPace Premium</span></h2>
+      <p class="lead">Выберите один или несколько тарифов и оформите их. Можно отключить в любой момент.</p>
+      <div class="plans-grid" id="plansGrid"></div>
+      <div class="total" aria-live="polite">
+        <span>Выбрано тарифов: <strong id="tCount">0</strong>. Итого: <strong id="tSum">0 тп</strong></span>
+        <a class="btn alt" href="#profile">Перейти в профиль</a>
+      </div>
+      <p class="note">Это демонстрационная версия: оплата не подключена, оформление сохраняется только в вашем браузере.</p>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap">EduPace — сайт для школьников и студентов Москвы. Данные хранятся только на вашем устройстве.</div></footer>
+<section id="editor" role="dialog" aria-modal="true" aria-label="Редактор дела">
+  <div class="wrap">
+    <button type="button" class="icon-btn pclose" id="editClose" aria-label="Закрыть редактор">×</button>
+    <h2>Редактировать</h2>
+    <form class="add" id="editForm">
+      <label>Название<input id="eTitle" type="text" maxlength="60" required></label>
+      <label>Дата<input id="eDate" type="date" required></label>
+      <label>Начало<input id="eStart" type="time" required></label>
+      <label>Конец<input id="eEnd" type="time" required></label>
+      <label>Тип и цвет<span class="typerow"><select id="eType"></select><input id="eColor" type="color" value="#6d3fd6" aria-label="Цвет метки" title="Цвет метки"></span></label>
+      <label>Напомнить<select id="eRemind"></select></label>
+      <label class="chk" id="eAllRow" hidden><input type="checkbox" id="eAll">Применить ко всем повторам (дата меняется только у этого дня)</label>
+      <div class="err" id="eErr" role="alert"></div>
+      <button class="btn" type="submit">Сохранить</button>
+    </form>
+  </div>
+</section>
+<div class="remind-stack" id="remindStack" aria-live="polite"></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const DAYS=["Пн","Вт","Ср","Чт","Пт","Сб","Вс"];
+const TYPES={study:{name:"Учёба",color:"var(--c1)"},event:{name:"Мероприятие",color:"var(--c4)"},club:{name:"Секция и кружок",color:"var(--c3)"},rest:{name:"Отдых и личное",color:"var(--c2)"}};
+const EVENT_KINDS={lecture:"Лекция",open:"День открытых дверей",master:"Мастер-класс",excursion:"Экскурсия"};
+const KIND_COLOR={lecture:"var(--c1)",open:"var(--c4)",master:"var(--c3)",excursion:"var(--c2)"};
+const AUD={all:"Всем",school:"Школьникам",student:"Студентам"};
+const PLANS=[
+  {id:"chat",title:"Чат-консультант и помощник",price:100,text:"Задавайте вопросы о расписании, учёбе и выборе мероприятий и получайте подсказки в любое время."},
+  {id:"friends",title:"Безлимитный поиск друзей",price:101,text:"Находите единомышленников из своего района, школы или вуза без ограничений."},
+  {id:"access",title:"Доступ ко всем мероприятиям и олимпиадам",price:120,text:"Неограниченный доступ ко всем лекциям, дням открытых дверей, мастер-классам и олимпиадам."}
+];
+/* Примеры. Замените на реальные мероприятия. */
+const EVENTS=[
+  {id:1,title:"Лекция «Как устроен искусственный интеллект»",kind:"lecture",aud:"all",place:"Москва, лекторий (укажите адрес)",day:2,start:"18:30",end:"20:00",date:"Среда"},
+  {id:2,title:"День открытых дверей технического вуза",kind:"open",aud:"school",place:"Москва, главный корпус",day:5,start:"11:00",end:"14:00",date:"Суббота"},
+  {id:3,title:"Мастер-класс по публичным выступлениям",kind:"master",aud:"student",place:"Москва, коворкинг",day:3,start:"19:00",end:"21:00",date:"Четверг"},
+  {id:4,title:"Экскурсия в музей науки",kind:"excursion",aud:"school",place:"Москва, музей",day:6,start:"12:00",end:"14:00",date:"Воскресенье"},
+  {id:5,title:"Лекция о карьере в медицине",kind:"lecture",aud:"school",place:"Москва, медицинский университет",day:1,start:"17:00",end:"18:30",date:"Вторник"},
+  {id:6,title:"Мастер-класс «Резюме и первое собеседование»",kind:"master",aud:"student",place:"Онлайн",day:4,start:"16:00",end:"17:30",date:"Пятница"},
+  {id:7,title:"День открытых дверей магистратуры",kind:"open",aud:"student",place:"Москва, университет",day:5,start:"15:00",end:"17:00",date:"Суббота"},
+  {id:8,title:"Лекция по истории архитектуры Москвы",kind:"lecture",aud:"all",place:"Москва, библиотека",day:0,start:"18:00",end:"19:30",date:"Понедельник"}
+];
+
+const $=id=>document.getElementById(id);
+function load(k,d){try{const v=localStorage.getItem(k+(user?":"+user.email:""));return v?JSON.parse(v):d}catch(e){return d}}
+function store(k,v){try{localStorage.setItem(k+(user?":"+user.email:""),JSON.stringify(v))}catch(e){}}
+let user=null;
+let items=[],profile={},myPlans=[];
+function loadUserData(){
+  items=load("edupace_schedule_v2",[]);
+  profile=load("edupace_profile_v1",{});
+  myPlans=load("edupace_plans_v1",[]);
+}
+const toMin=t=>{const[h,m]=t.split(":").map(Number);return h*60+m};
+function toast(msg){const t=$("toast");t.textContent=msg;t.classList.add("on");clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove("on"),2200)}
+
+/* Календарь */
+TYPES.other={name:"Другое",color:"#e8871e"};
+const TYPE_HEX={study:"#6d3fd6",event:"#c24bb0",club:"#3f3fb8",rest:"#a35fe0",other:"#e8871e"};
+const itemColor=i=>i.color||TYPES[i.type].color;
+let colorTouched=false;
+const REMINDS=[[0,"Не напоминать"],[10,"за 10 минут"],[30,"за 30 минут"],[60,"за час"],[1440,"за день"],[2880,"за 2 дня"]];
+const MONTHS=["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"];
+const MONTHS_G=["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"];
+const WD_FULL=["Понедельник","Вторник","Среда","Четверг","Пятница","Суббота","Воскресенье"];
+const pad=n=>String(n).padStart(2,"0");
+const iso=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const parseISO=s=>{const[y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)};
+const todayISO=()=>iso(new Date());
+let view=new Date();view.setDate(1);
+let selected=todayISO();
+
+function nextDate(weekday){
+  const d=new Date();
+  d.setDate(d.getDate()+((weekday-((d.getDay()+6)%7)+7)%7));
+  return iso(d);
+}
+function goTo(dateStr){selected=dateStr;const d=parseISO(dateStr);view=new Date(d.getFullYear(),d.getMonth(),1)}
+function overlaps(a){return items.some(i=>i.date===a.date&&toMin(a.start)<toMin(i.end)&&toMin(a.end)>toMin(i.start))}
+
+function addItem(a,until){
+  if(!a.date) return {err:"Выберите дату."};
+  if(toMin(a.end)<=toMin(a.start)) return {err:"Время окончания должно быть позже начала."};
+  const dates=[a.date];
+  if(a.repeat==="weekly"){
+    if(!until||until<a.date) return {err:"Укажите дату, до которой повторять."};
+    const d=parseISO(a.date);
+    while(dates.length<200){d.setDate(d.getDate()+7);const s=iso(d);if(s>until)break;dates.push(s)}
+  }
+  const free=dates.filter(s=>!overlaps({...a,date:s}));
+  if(!free.length) return {err:"В это время уже есть занятие. Выберите другое время."};
+  const g=String(Date.now());
+  free.forEach((s,k)=>items.push({title:a.title,date:s,start:a.start,end:a.end,type:a.type,color:a.color||undefined,remind:+a.remind||0,evId:a.evId,g:g,id:g+"-"+k}));
+  store("edupace_schedule_v2",items);renderProfile();
+  return {err:"",note:dates.length>free.length?"Добавлено "+free.length+" из "+dates.length+": в остальные дни это время занято.":(dates.length>1?"Добавлено повторов: "+free.length:"")};
+}
+function removeItem(it,all){
+  items=items.filter(x=>all?x.g!==it.g:x.id!==it.id);
+  store("edupace_schedule_v2",items);renderSchedule();renderCards();renderProfile();toast("Удалено");
+}
+
+function renderSchedule(){
+  const y=view.getFullYear(),m=view.getMonth();
+  $("calTitle").textContent=MONTHS[m]+" "+y;
+  const lead=(new Date(y,m,1).getDay()+6)%7;
+  const days=new Date(y,m+1,0).getDate();
+  const cells=Math.ceil((lead+days)/7)*7;
+  const grid=$("calGrid");grid.innerHTML="";
+  DAYS.forEach(n=>{const h=document.createElement("div");h.className="wd";h.textContent=n;grid.appendChild(h)});
+  const t=todayISO();
+  for(let c=0;c<cells;c++){
+    const d=new Date(y,m,1-lead+c),s=iso(d);
+    const cell=document.createElement("button");cell.type="button";
+    cell.className="cell"+(d.getMonth()!==m?" other":"")+(s===t?" today":"")+(s===selected?" sel":"");
+    const list=items.filter(i=>i.date===s).sort((a,b)=>toMin(a.start)-toMin(b.start));
+    cell.setAttribute("aria-label",d.getDate()+" "+MONTHS_G[d.getMonth()]+(list.length?", дел: "+list.length:""));
+    const num=document.createElement("span");num.className="num";num.textContent=d.getDate();cell.appendChild(num);
+    list.slice(0,2).forEach(i=>{
+      const p=document.createElement("span");p.className="pill";p.style.setProperty("--c",itemColor(i));
+      p.textContent=i.start+" "+i.title;cell.appendChild(p);
+    });
+    if(list.length>2){const mo=document.createElement("span");mo.className="more";mo.textContent="ещё "+(list.length-2);cell.appendChild(mo)}
+    cell.onclick=()=>{selected=s;$("fDate").value=s;if(d.getMonth()!==m){view=new Date(d.getFullYear(),d.getMonth(),1)}renderSchedule()};
+    grid.appendChild(cell);
+  }
+  renderDay();renderStats();checkReminders();
+}
+function renderDay(){
+  const box=$("dayView");box.innerHTML="";
+  const d=parseISO(selected);
+  const h=document.createElement("h3");
+  h.textContent=WD_FULL[(d.getDay()+6)%7]+", "+d.getDate()+" "+MONTHS_G[d.getMonth()];
+  box.appendChild(h);
+  const list=items.filter(i=>i.date===selected).sort((a,b)=>toMin(a.start)-toMin(b.start));
+  if(!list.length){const p=document.createElement("div");p.className="empty";p.textContent="В этот день ничего не запланировано. Заполните форму выше, дата уже подставлена.";box.appendChild(p)}
+  list.forEach(i=>{
+    const el=document.createElement("div");el.className="item";el.style.setProperty("--c",itemColor(i));
+    const s=document.createElement("strong");s.textContent=i.title;
+    const t=document.createElement("time");t.textContent=i.start+"–"+i.end+", "+TYPES[i.type].name;
+    const acts=document.createElement("div");acts.className="acts";
+    acts.appendChild(remindSelect(i));
+    const ed=document.createElement("button");ed.type="button";ed.className="del neutral";ed.textContent="Изменить";ed.setAttribute("aria-label","Изменить: "+i.title);ed.onclick=()=>openEditor(i);acts.appendChild(ed);
+    const b=document.createElement("button");b.type="button";b.className="del";b.textContent="Удалить";b.setAttribute("aria-label","Удалить: "+i.title);
+    b.onclick=()=>removeItem(i,false);acts.appendChild(b);
+    if(items.filter(x=>x.g===i.g).length>1){
+      const r=document.createElement("button");r.type="button";r.className="del";r.textContent="Удалить все повторы";
+      r.onclick=()=>removeItem(i,true);acts.appendChild(r);
+    }
+    el.append(s,t,acts);
+    box.appendChild(el);
+  });
+}
+function renderStats(){
+  const ym=view.getFullYear()+"-"+pad(view.getMonth()+1);
+  const totals={};
+  items.filter(i=>i.date.startsWith(ym)).forEach(i=>{totals[i.type]=(totals[i.type]||0)+toMin(i.end)-toMin(i.start)});
+  const st=$("stats");st.innerHTML="";
+  const keys=Object.keys(totals);
+  if(!keys.length){st.innerHTML='<span class="empty">В этом месяце пока пусто. Нажмите на день и добавьте занятие.</span>'}
+  keys.forEach(k=>{
+    const s=document.createElement("span");s.className="stat";
+    s.innerHTML='<span class="dot" style="background:'+TYPES[k].color+'"></span>'+TYPES[k].name+": "+(Math.round(totals[k]/6)/10)+" ч";
+    st.appendChild(s);
+  });
+}
+$("prevM").onclick=()=>{view=new Date(view.getFullYear(),view.getMonth()-1,1);renderSchedule()};
+$("nextM").onclick=()=>{view=new Date(view.getFullYear(),view.getMonth()+1,1);renderSchedule()};
+$("todayBtn").onclick=()=>{goTo(todayISO());$("fDate").value=selected;renderSchedule()};
+$("fRep").onchange=()=>{$("untilRow").hidden=($("fRep").value!=="weekly")};
+$("fDate").value=todayISO();
+$("fType").onchange=()=>{if(!colorTouched)$("fColor").value=TYPE_HEX[$("fType").value]};
+$("fColor").oninput=()=>{colorTouched=true};
+
+/* Напоминания */
+function remindSelect(i){
+  const sel=document.createElement("select");sel.setAttribute("aria-label","Напомнить о: "+i.title);
+  REMINDS.forEach(([v,l])=>{const o=document.createElement("option");o.value=v;o.textContent=v?"Напомнить "+l:l;sel.appendChild(o)});
+  sel.value=String(i.remind||0);
+  sel.onchange=()=>{i.remind=+sel.value;i.notified=false;store("edupace_schedule_v2",items);if(i.remind){askNotif()}toast(i.remind?"Напомним "+REMINDS.find(r=>r[0]===i.remind)[1]:"Напоминание выключено");checkReminders()};
+  return sel;
+}
+function showReminder(i){
+  const dd=parseISO(i.date);const text=i.title+", "+(i.date===todayISO()?"сегодня":dd.getDate()+" "+MONTHS_G[dd.getMonth()])+" в "+i.start;
+  const el=document.createElement("div");el.className="remind";
+  const body=document.createElement("div");const b=document.createElement("b");b.textContent="Напоминание";
+  body.append(b,document.createTextNode(text));
+  const x=document.createElement("button");x.type="button";x.textContent="×";x.setAttribute("aria-label","Закрыть");x.onclick=()=>el.remove();
+  el.append(body,x);$("remindStack").appendChild(el);
+  try{if("Notification" in window&&Notification.permission==="granted"){new Notification("EduPace: "+text)}}catch(e){}
+}
+function checkReminders(){
+  if(!user)return;
+  const now=Date.now();let ch=false;
+  items.forEach(i=>{
+    if(!i.remind||i.notified)return;
+    const st=parseISO(i.date);const hm=i.start.split(":").map(Number);st.setHours(hm[0],hm[1],0,0);
+    const t=st.getTime();
+    if(now>=t-i.remind*60000){i.notified=true;ch=true;if(now<t){showReminder(i)}}
+  });
+  if(ch){store("edupace_schedule_v2",items)}
+}
+function updNotif(){
+  let t="";
+  try{
+    if(!("Notification" in window)){t="Уведомления браузера здесь недоступны, напоминания появятся на странице."}
+    else if(Notification.permission==="granted"){t="Уведомления браузера включены."}
+    else if(Notification.permission==="denied"){t="Уведомления заблокированы в настройках браузера, напоминания появятся на странице."}
+  }catch(e){}
+  $("notifState").textContent=t;
+}
+function askNotif(){
+  try{
+    if("Notification" in window&&Notification.permission==="default"){
+      const r=Notification.requestPermission();
+      if(r&&r.then){r.then(updNotif)}else{setTimeout(updNotif,500)}
+    }
+  }catch(e){}
+}
+$("notifBtn").onclick=()=>{askNotif();updNotif()};
+updNotif();
+setInterval(checkReminders,30000);
+
+/* Профиль открывается по кнопке вверху справа */
+function openProfile(){$("profile").classList.add("open");document.body.style.overflow="hidden";fillProfileForm();renderProfile();$("uName").focus()}
+function closeProfile(){$("profile").classList.remove("open");document.body.style.overflow=""}
+document.querySelectorAll('a[href="#profile"]').forEach(a=>a.addEventListener("click",e=>{e.preventDefault();openProfile()}));
+$("profileClose").onclick=closeProfile;
+$("profile").addEventListener("click",e=>{if(e.target===$("profile")){closeProfile()}});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeProfile()}});
+
+/* Редактор дела */
+let editing=null,eColorTouched=false;
+Object.keys(TYPES).forEach(k=>{const o=document.createElement("option");o.value=k;o.textContent=TYPES[k].name;$("eType").appendChild(o)});
+REMINDS.forEach(([v,l])=>{const o=document.createElement("option");o.value=v;o.textContent=v?"Напомнить "+l:l;$("eRemind").appendChild(o)});
+function openEditor(i){
+  editing=i;eColorTouched=!!i.color;
+  $("eTitle").value=i.title;$("eDate").value=i.date;$("eStart").value=i.start;$("eEnd").value=i.end;
+  $("eType").value=i.type;$("eColor").value=i.color||TYPE_HEX[i.type];$("eRemind").value=String(i.remind||0);
+  $("eAllRow").hidden=!(items.filter(x=>x.g===i.g).length>1);$("eAll").checked=false;$("eErr").textContent="";
+  $("editor").classList.add("open");document.body.style.overflow="hidden";$("eTitle").focus();
+}
+function closeEditor(){
+  $("editor").classList.remove("open");
+  if(!$("profile").classList.contains("open")){document.body.style.overflow=""}
+  editing=null;
+}
+$("eType").onchange=()=>{if(!eColorTouched){$("eColor").value=TYPE_HEX[$("eType").value]}};
+$("eColor").oninput=()=>{eColorTouched=true};
+$("editClose").onclick=closeEditor;
+$("editor").addEventListener("click",e=>{if(e.target===$("editor")){closeEditor()}});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeEditor()}});
+$("editForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const i=editing;if(!i){return}
+  const title=$("eTitle").value.trim(),date=$("eDate").value,start=$("eStart").value,end=$("eEnd").value;
+  const type=$("eType").value,remind=+$("eRemind").value;
+  const col=$("eColor").value;const color=col.toLowerCase()===TYPE_HEX[type]?undefined:col;
+  const err=$("eErr");
+  if(!title){err.textContent="Введите название.";return}
+  if(toMin(end)<=toMin(start)){err.textContent="Время окончания должно быть позже начала.";return}
+  const targets=($("eAll").checked&&!$("eAllRow").hidden)?items.filter(x=>x.g===i.g):[i];
+  const ids=new Set(targets.map(x=>x.id));
+  const others=items.filter(x=>!ids.has(x.id));
+  for(const t of targets){
+    const d=(t===i)?date:t.date;
+    if(others.some(o=>o.date===d&&toMin(start)<toMin(o.end)&&toMin(end)>toMin(o.start))){err.textContent="В это время ("+d+") уже есть другое занятие.";return}
+  }
+  targets.forEach(t=>{t.title=title;t.start=start;t.end=end;t.type=type;t.color=color;t.remind=remind;t.notified=false;if(t===i){t.date=date}});
+  store("edupace_schedule_v2",items);
+  goTo(date);renderSchedule();renderCards();renderProfile();closeEditor();toast("Сохранено");
+});
+
+/* Подчёркивание раздела в меню при прокрутке */
+const navLinks=[...document.querySelectorAll('nav a[href^="#"]')].filter(a=>a.getAttribute("href")!=="#profile");
+function spy(){
+  const y=window.scrollY||document.documentElement.scrollTop;
+  const base=y+130;
+  let cur=null;
+  navLinks.forEach(a=>{const el=document.querySelector(a.getAttribute("href"));if(el&&el.getBoundingClientRect().top+y<=base){cur=a}});
+  if(navLinks.length&&window.innerHeight+y>=document.documentElement.scrollHeight-4){cur=navLinks[navLinks.length-1]}
+  navLinks.forEach(a=>{if(a===cur){a.setAttribute("aria-current","true")}else{a.removeAttribute("aria-current")}});
+}
+window.addEventListener("scroll",spy,{passive:true});
+window.addEventListener("resize",spy);
+navLinks.forEach(a=>a.addEventListener("click",()=>setTimeout(spy,400)));
+spy();
+
+$("addForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const date=$("fDate").value;
+  const r=addItem({title:$("fTitle").value.trim(),date:date,start:$("fStart").value,end:$("fEnd").value,type:$("fType").value,repeat:$("fRep").value,color:colorTouched?$("fColor").value:"",remind:$("fRemind").value},$("fUntil").value);
+  $("err").textContent=r.err;
+  if(!r.err){$("fTitle").value="";colorTouched=false;$("fColor").value=TYPE_HEX[$("fType").value];goTo(date);renderSchedule();renderCards();toast(r.note||"Добавлено в календарь")}
+});
+
+let fKind="all",fAud="all";
+function chips(box,opts,get,set){
+  box.innerHTML="";
+  Object.entries({all:"Все",...opts}).forEach(([k,v])=>{
+    const b=document.createElement("button");b.type="button";b.className="chip";b.textContent=v;
+    b.setAttribute("aria-pressed",String(get()===k));
+    b.onclick=()=>{set(k);chips(box,opts,get,set);renderCards()};
+    box.appendChild(b);
+  });
+}
+function renderCards(){
+  const box=$("cards");box.innerHTML="";
+  const list=EVENTS.filter(e=>(fKind==="all"||e.kind===fKind)&&(fAud==="all"||e.aud===fAud||e.aud==="all"));
+  if(!list.length){box.innerHTML='<p class="empty">Ничего не найдено. Попробуйте другой тип или аудиторию.</p>';return}
+  list.forEach(e=>{
+    const added=items.some(i=>i.evId===e.id);
+    const c=document.createElement("article");c.className="card";c.style.setProperty("--c",KIND_COLOR[e.kind]);
+    const tag=document.createElement("span");tag.className="tag";tag.textContent=EVENT_KINDS[e.kind];
+    const h=document.createElement("h3");h.textContent=e.title;
+    const m=document.createElement("div");m.className="meta";
+    m.textContent=`${e.date}, ${e.start}–${e.end}. ${e.place}. Для: ${AUD[e.aud].toLowerCase()}.`;
+    const b=document.createElement("button");b.type="button";b.className="btn";
+    b.textContent=added?"Убрать из календаря":"В расписание";if(added){b.classList.add("alt")}
+    b.onclick=()=>{
+      if(added){items=items.filter(x=>x.evId!==e.id);store("edupace_schedule_v2",items);renderSchedule();renderProfile();renderCards();toast("Убрано из календаря");return}
+      const r=addItem({title:e.title,date:nextDate(e.day),start:e.start,end:e.end,type:"event",evId:e.id,repeat:"none"});const msg=r.err;if(!msg){goTo(nextDate(e.day));renderSchedule()}
+      toast(msg||"Мероприятие добавлено в расписание");renderCards();
+    };
+    c.append(tag,h,m,b);box.appendChild(c);
+  });
+}
+
+function renderProfile(){
+  const name=(profile.name||"").trim();
+  const letter=name?name[0].toUpperCase():"?";
+  $("navAva").textContent=letter;$("navName").textContent=name||"Профиль";
+  $("pAva").textContent=letter;$("pName").textContent=name||"Имя не указано";
+  $("pRole").textContent=[profile.role,ageText(profile.age)].filter(Boolean).join(", ")||"Статус не выбран";
+  $("pPlace").textContent=[profile.place].filter(Boolean).join(", ")||"Учебное заведение не указано";
+  $("pStats").textContent="Занятий в расписании: "+items.length;
+  const box=$("pPlans");box.innerHTML="";
+  if(!myPlans.length){const p=document.createElement("p");p.textContent="Тарифы не оформлены";box.appendChild(p)}
+  PLANS.filter(p=>myPlans.includes(p.id)).forEach(p=>{const s=document.createElement("span");s.className="plan-badge";s.textContent=p.title;box.appendChild(s)});
+}
+function ageText(a){
+  if(!a){return ""}
+  const n=+a;if(!n){return a}
+  const m=n%10,h=n%100;
+  return n+" "+((m===1&&h!==11)?"год":((m>=2&&m<=4&&(h<10||h>=20))?"года":"лет"));
+}
+(function(){
+  const sel=$("uAge");
+  const add=(v,t)=>{const o=document.createElement("option");o.value=v;o.textContent=t;sel.appendChild(o)};
+  add("","Выберите");
+  for(let n=10;n<=30;n++){add(String(n),String(n))}
+  add("Старше 30","Старше 30");
+})();
+function fillProfileForm(){
+  $("uName").value=profile.name||"";$("uRole").value=profile.role||"";
+  $("uPlace").value=profile.place||"";$("uAge").value=profile.age||"";
+  $("uEmail").value=profile.email||"";
+  $("uInterests").value=profile.interests||"";
+}
+$("profileForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  profile={name:$("uName").value.trim(),role:$("uRole").value,place:$("uPlace").value.trim(),age:$("uAge").value,email:$("uEmail").value.trim(),interests:$("uInterests").value.trim()};
+  store("edupace_profile_v1",profile);renderProfile();toast("Профиль сохранён");closeProfile();
+});
+
+function renderPlans(){
+  const grid=$("plansGrid");grid.innerHTML="";
+  PLANS.forEach(p=>{
+    const on=myPlans.includes(p.id);
+    const c=document.createElement("article");c.className="plan"+(on?" on":"");
+    const h=document.createElement("h3");h.textContent=p.title;
+    const pr=document.createElement("div");pr.className="price";pr.innerHTML=p.price+' <small>тп</small>';
+    const t=document.createElement("p");t.textContent=p.text;
+    const b=document.createElement("button");b.type="button";b.className="btn"+(on?" alt":"");
+    b.textContent=on?"Отключить":"Оформить";
+    b.onclick=()=>{
+      myPlans=on?myPlans.filter(x=>x!==p.id):[...myPlans,p.id];
+      store("edupace_plans_v1",myPlans);renderPlans();renderProfile();
+      toast(on?"Тариф отключён":"Тариф оформлен");
+    };
+    c.append(h,pr,t,b);grid.appendChild(c);
+  });
+  const sum=PLANS.filter(p=>myPlans.includes(p.id)).reduce((s,p)=>s+p.price,0);
+  $("tCount").textContent=myPlans.length;$("tSum").textContent=sum+" тп";
+}
+
+/* Переключение светлой и тёмной темы */
+const MOON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
+const SUN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+function applyTheme(t,save){
+  document.documentElement.setAttribute("data-theme",t);
+  if(save){try{localStorage.setItem("edupace_theme",t)}catch(e){}}
+  document.querySelectorAll(".theme-btn").forEach(b=>{
+    b.innerHTML=t==="dark"?SUN:MOON;
+    b.setAttribute("aria-label",t==="dark"?"Включить светлую тему":"Включить тёмную тему");
+  });
+}
+document.querySelectorAll(".theme-btn").forEach(b=>{
+  b.onclick=()=>applyTheme(document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark",true);
+});
+applyTheme(document.documentElement.getAttribute("data-theme")||"light",false);
+
+chips($("typeChips"),EVENT_KINDS,()=>fKind,v=>fKind=v);
+chips($("audChips"),{school:"Школьникам",student:"Студентам"},()=>fAud,v=>fAud=v);
+/* Вход и регистрация (демо: всё хранится в браузере) */
+const USERS_KEY="edupace_users_v1",SESSION_KEY="edupace_session_v1";
+let mode="login";
+function readUsers(){try{return JSON.parse(localStorage.getItem(USERS_KEY)||"{}")}catch(e){return {}}}
+function writeUsers(u){try{localStorage.setItem(USERS_KEY,JSON.stringify(u))}catch(e){}}
+async function hashPass(email,pass){
+  const data=new TextEncoder().encode(email+":"+pass);
+  const buf=await crypto.subtle.digest("SHA-256",data);
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+function setMode(m){
+  mode=m;
+  $("tabLogin").setAttribute("aria-pressed",String(m==="login"));
+  $("tabReg").setAttribute("aria-pressed",String(m==="register"));
+  $("nameRow").hidden=(m!=="register");
+  $("aBtn").textContent=m==="login"?"Войти":(m==="reset"?"Отправить ссылку":"Создать аккаунт");
+  $("passRow").hidden=(m==="reset");$("aPass").required=(m!=="reset");
+  $("forgotBtn").hidden=(m!=="login");$("resetHint").hidden=(m!=="reset");$("backBtn").hidden=(m!=="reset");
+  $("aOk").textContent="";
+  $("aPass").autocomplete=m==="login"?"current-password":"new-password";
+  $("aErr").textContent="";
+}
+$("tabLogin").onclick=()=>setMode("login");
+$("tabReg").onclick=()=>setMode("register");
+$("forgotBtn").onclick=()=>setMode("reset");
+$("backBtn").onclick=()=>setMode("login");
+
+function enterApp(email,name){
+  user={email:email};
+  try{localStorage.setItem(SESSION_KEY,email)}catch(e){}
+  loadUserData();
+  if(!profile.email){profile.email=email}
+  if(!profile.name&&name){profile.name=name}
+  store("edupace_profile_v1",profile);
+  document.body.classList.remove("guest");
+  fillProfileForm();renderSchedule();renderCards();renderProfile();renderPlans();
+  window.scrollTo(0,0);
+}
+
+$("authForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const email=$("aEmail").value.trim().toLowerCase();
+  const pass=$("aPass").value;
+  const name=$("aName").value.trim();
+  const users=readUsers();
+  if(mode==="reset"){
+    $("aOk").textContent="Если такой аккаунт есть, мы отправили на "+email+" ссылку для создания нового пароля. В демо-версии письма не отправляются.";
+    return;
+  }
+  if(pass.length<6){$("aErr").textContent="Пароль должен быть не короче 6 символов.";return}
+  const h=await hashPass(email,pass);
+  if(mode==="register"){
+    if(users[email]){$("aErr").textContent="Аккаунт с такой почтой уже есть. Перейдите на вкладку «Вход».";return}
+    users[email]={name:name,hash:h};writeUsers(users);
+    $("authForm").reset();enterApp(email,name);toast("Аккаунт создан");
+  }else{
+    if(!users[email]||users[email].hash!==h){$("aErr").textContent="Неверная почта или пароль.";return}
+    $("authForm").reset();enterApp(email,users[email].name);toast("Вы вошли");
+  }
+});
+
+$("logoutBtn").onclick=()=>{
+  try{localStorage.removeItem(SESSION_KEY)}catch(e){}
+  user=null;items=[];profile={};myPlans=[];
+  document.body.classList.add("guest");
+  setMode("login");window.scrollTo(0,0);
+};
+
+/* Автовход, если уже входили на этом устройстве */
+(function(){
+  let email=null;
+  try{email=localStorage.getItem(SESSION_KEY)}catch(e){}
+  const users=readUsers();
+  if(email&&users[email]){enterApp(email,users[email].name)}
+})();
+</script>
+</body>
+</html>
